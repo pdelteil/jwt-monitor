@@ -6,10 +6,6 @@ This Burp Suite extension monitors a provided JWT token for its expiration and r
 
 ![image](overview.png)
 
-### Releases
-
-Releases can be found in [build/libs](./../../tree/main/build/libs).
-
 ### How to build the project
 
 In IntelliJ click the Elephant Symbol on the far right hand bar and visit `Tasks -> shadow -> shadowJar`
