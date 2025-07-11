@@ -40,9 +40,16 @@ class JWTMonitor : BurpExtension, HttpHandler {
         api.extension().setName("JWT Monitor")
         api.http().registerHttpHandler(this)
 
-        // Initialize TaskExecutionEngine
         taskExecutionEngine = api.burpSuite().taskExecutionEngine()
 
+        val mainPanel = createUI()
+        api.userInterface().registerSuiteTab("JWT Monitor", mainPanel)
+
+        api.logging().logToOutput("JWT Monitor loaded successfully!")
+        appendLogEntry("JWT Monitor loaded successfully! Let the hunt begin!")
+    }
+
+    private fun createUI(): JPanel {
         val mainPanel = JPanel(BorderLayout())
         mainPanel.border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
 
@@ -159,9 +166,7 @@ class JWTMonitor : BurpExtension, HttpHandler {
         disclaimerLabel.border = BorderFactory.createEmptyBorder(10, 0, 0, 0)
         jwtMonitorTab.add(disclaimerLabel, BorderLayout.SOUTH)
 
-        api.userInterface().registerSuiteTab("JWT Monitor", mainPanel)
-        api.logging().logToOutput("JWT Monitor loaded successfully!")
-        appendLogEntry("JWT Monitor loaded successfully! Let the hunt begin!")
+        return mainPanel
     }
 
     private fun appendLogEntry(entry: String) {
@@ -197,7 +202,7 @@ class JWTMonitor : BurpExtension, HttpHandler {
 
                     cookies.forEach { cookie ->
                         val (name, value) = cookie.split("=", limit = 2)
-                        if (replacementJWTToken.isNotBlank() && value.startsWith("eyJ")) {
+                        if (value.startsWith("eyJ")) {
                             newCookies.add("$name=$replacementJWTToken")
                         } else {
                             newCookies.add(cookie)
@@ -271,10 +276,19 @@ class JWTMonitor : BurpExtension, HttpHandler {
 
             } else {
                 appendLogEntry("Got a JWT token from issuer \"${decodedJWT.issuer}\". It has no expiration date.")
+                expirationLabel.text = "No expiration date found."
+                expirationLabel.foreground = Color.BLACK
+                expirationTimer?.cancel()
             }
 
         } catch (e: JWTDecodeException) {
             appendLogEntry("Got a JWT but could not decode it: ${e.message}")
+            expirationLabel.text = expirationInit
+            expirationLabel.foreground = Color.BLACK
+            headerTextArea.text = ""
+            payloadTextArea.text = ""
+            signatureTextArea.text = ""
+            expirationTimer?.cancel()
         }
     }
 }

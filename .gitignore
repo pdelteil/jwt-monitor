@@ -1,1 +1,18 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ IDEA
+.idea/
+
+# Kotlin
+.kotlin/
+
+# macOS
 .DS_Store
+
+# Log files
+*.log
+
+# Local properties file (a common practice)
+local.properties
