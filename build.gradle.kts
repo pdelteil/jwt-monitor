@@ -11,7 +11,7 @@ plugins {
 
 //Change this to reflect your package namespace
 group = "ch.redguard.montoya"
-version = "1.1.0"
+version = "1.1.1"
 
 repositories {
     //add maven local in case you want to build some reusable libraries and host them within your home directory

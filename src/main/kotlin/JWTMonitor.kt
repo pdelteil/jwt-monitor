@@ -2,6 +2,7 @@ import burp.api.montoya.BurpExtension
 import burp.api.montoya.MontoyaApi
 import burp.api.montoya.burpsuite.TaskExecutionEngine
 import burp.api.montoya.burpsuite.TaskExecutionEngine.TaskExecutionEngineState
+import burp.api.montoya.extension.ExtensionUnloadingHandler
 import burp.api.montoya.http.handler.*
 import com.auth0.jwt.JWT
 import com.auth0.jwt.exceptions.JWTDecodeException
@@ -17,7 +18,7 @@ import java.util.*
 import java.util.Timer
 import javax.swing.*
 
-class JWTMonitor : BurpExtension, HttpHandler {
+class JWTMonitor : BurpExtension, HttpHandler, ExtensionUnloadingHandler {
     private lateinit var api: MontoyaApi
     private lateinit var taskExecutionEngine: TaskExecutionEngine
 
@@ -38,7 +39,9 @@ class JWTMonitor : BurpExtension, HttpHandler {
 
         api.logging().logToOutput("Started loading the extension...")
         api.extension().setName("JWT Monitor")
+
         api.http().registerHttpHandler(this)
+        api.extension().registerUnloadingHandler(this)
 
         taskExecutionEngine = api.burpSuite().taskExecutionEngine()
 
@@ -47,6 +50,13 @@ class JWTMonitor : BurpExtension, HttpHandler {
 
         api.logging().logToOutput("JWT Monitor loaded successfully!")
         appendLogEntry("JWT Monitor loaded successfully! Let the hunt begin!")
+    }
+
+    override fun extensionUnloaded() {
+        // Clean up resources
+        expirationTimer?.cancel()
+        expirationTimer = null
+        api.logging().logToOutput("JWT Monitor unloaded. Timer stopped.")
     }
 
     private fun createUI(): JPanel {
