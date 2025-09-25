@@ -199,7 +199,7 @@ class JWTMonitor : BurpExtension, HttpHandler, ExtensionUnloadingHandler {
             ?.let { _ ->
                 if (replacementJWTToken.isNotBlank()) {
                     appendLogEntry("Replaced the JWT in the header for a ${requestToBeSent.method()} request to ${requestToBeSent.path()}.")
-                    return RequestToBeSentAction.continueWith(requestToBeSent.withUpdatedHeader("Authorization", "Bearer $replacementJWTToken"))
+                    return RequestToBeSentAction.continueWith(requestToBeSent.withUpdatedHeader("Authorization", "$replacementJWTToken"))
                 }
             }
 
